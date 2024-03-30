@@ -1,10 +1,8 @@
-import './App.css';
+import Body from "./components/Body";
 
 function App() {
   return (
-    <div className=" text-center">
-      Hii Jomin Let's Start!
-    </div>
+    <Body />
   );
 }
 
