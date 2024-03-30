@@ -1,11 +1,20 @@
 import React, { useRef, useState } from 'react';
 import Header from "./Header";
 import { checkValidData  } from '../utils/validate';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile  } from "firebase/auth";
+import { auth } from '../utils/firebase';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { addUser } from '../utils/userSlice';
 
 const Login = () => {
     const [ signIn, setSignIn ] = useState(true);
     const [ errorMessage, setErrorMessage ] = useState("");
 
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
+
+    const name = useRef(null);
     const email = useRef(null);
     const password = useRef(null);
 
@@ -16,6 +25,47 @@ const Login = () => {
     const handleClick = ()=>{
         const err = checkValidData(email.current.value, password.current.value);
         setErrorMessage(err);
+
+        if(err) return;
+
+        if(!signIn){
+            createUserWithEmailAndPassword(auth, email.current.value, password.current.value)
+            .then((userCredential) => {
+              // Signed up 
+              const user = userCredential.user;
+              updateProfile(user, {
+                displayName: name.current.value
+              }).then(() => {
+                // Profile updated!
+                const { uid, email, displayName } = auth.currentUser;
+                dispatch(addUser({ uid: uid, email: email, displayName: displayName }))
+                navigate("/browse");
+              }).catch((error) => {
+                // An error occurred
+                setErrorMessage(error.message);
+              });
+              
+            })
+            .catch((error) => {
+              const errorCode = error.code;
+              const errorMessage = error.message;
+              setErrorMessage(errorCode + "-" + errorMessage);
+            });
+        }else{
+            signInWithEmailAndPassword(auth, email.current.value, password.current.value)
+            .then((userCredential) => {
+              // Signed in 
+              const user = userCredential.user;
+              console.log(user);
+              navigate("/browse");
+            })
+            .catch((error) => {
+              const errorCode = error.code;
+              const errorMessage = error.message;
+              setErrorMessage(errorCode + "-" + errorMessage);
+            });
+        }
+
     }
 
     return (
@@ -28,7 +78,7 @@ const Login = () => {
 
           <h1 className='py-2 my-4 font-bold text-4xl'> {signIn ? "Sign In" : "Sign Up"} </h1>
 
-          {!signIn && <input className='p-4 my-4 bg-zinc-800 rounded-md bg-opacity-70' type='text' placeholder='Full Name' /> }
+          {!signIn && <input ref={name} className='p-4 my-4 bg-zinc-800 rounded-md bg-opacity-70' type='text' placeholder='Full Name' /> }
 
           <input ref={email} className='p-4 my-4 bg-zinc-800 rounded-md bg-opacity-70' type='text' placeholder='Email' />
 
