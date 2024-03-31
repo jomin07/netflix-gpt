@@ -1,28 +1,48 @@
-import React from 'react'
-import { signOut } from "firebase/auth";
+import React, { useEffect } from 'react'
+import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "../utils/firebase";
 import { useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { addUser, removeUser } from "../utils/userSlice";
+import { LOGO_URL, PROFILE_URL } from '../utils/constants';
 
 const Header = () => {
   const navigate = useNavigate();
   const user = useSelector((store) => store.user);
+  const dispatch = useDispatch();
 
   const handleSignOut = () =>{  
     signOut(auth).then(() => {
-      navigate("/");
+
     }).catch((error) => {
-      // An error happened.
+      navigate("/error");
     });
   }
 
+  useEffect(() =>{
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        const { uid, email, displayName } = user;
+        dispatch(addUser({ uid: uid, email: email, displayName: displayName }));
+        navigate("/browse");
+      } else {
+        dispatch(removeUser());
+        navigate("/");
+      }
+    });
+    
+    return () => unsubscribe();
+
+  }, []);
+  
+
   return (
     <div className='absolute px-6 py-2 bg-gradient-to-b from-black z-10 w-screen flex justify-between '>
-      <img className='w-44' src='https://cdn.cookielaw.org/logos/dd6b162f-1a32-456a-9cfe-897231c7763c/4345ea78-053c-46d2-b11e-09adaef973dc/Netflix_Logo_PMS.png' alt='logo'></img>
+      <img className='w-44' src = {LOGO_URL} alt='logo'></img>
 
       {user && 
       (<div className='m-2 p-2 flex'>
-        <img className='w-10 mx-1' src='https://wallpapers.com/images/hd/netflix-profile-pictures-1000-x-1000-qo9h82134t9nv0j0.jpg' alt='img'></img>
+        <img className='w-10 mx-1' src={PROFILE_URL} alt='img'></img>
 
         <button onClick={handleSignOut} className='font-bold text-white mx-1'>Sign Out</button>
       </div>)}

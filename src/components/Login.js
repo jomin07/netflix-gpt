@@ -3,15 +3,13 @@ import Header from "./Header";
 import { checkValidData  } from '../utils/validate';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile  } from "firebase/auth";
 import { auth } from '../utils/firebase';
-import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { addUser } from '../utils/userSlice';
+import { BACKGROUND_URL } from '../utils/constants';
 
 const Login = () => {
     const [ signIn, setSignIn ] = useState(true);
     const [ errorMessage, setErrorMessage ] = useState("");
-
-    const navigate = useNavigate();
     const dispatch = useDispatch();
 
     const name = useRef(null);
@@ -38,8 +36,7 @@ const Login = () => {
               }).then(() => {
                 // Profile updated!
                 const { uid, email, displayName } = auth.currentUser;
-                dispatch(addUser({ uid: uid, email: email, displayName: displayName }))
-                navigate("/browse");
+                dispatch(addUser({ uid: uid, email: email, displayName: displayName }));
               }).catch((error) => {
                 // An error occurred
                 setErrorMessage(error.message);
@@ -56,8 +53,6 @@ const Login = () => {
             .then((userCredential) => {
               // Signed in 
               const user = userCredential.user;
-              console.log(user);
-              navigate("/browse");
             })
             .catch((error) => {
               const errorCode = error.code;
@@ -72,7 +67,7 @@ const Login = () => {
       <div >
         <Header />
         <div className='absolute'>
-          <img src='https://assets.nflxext.com/ffe/siteui/vlv3/7ca5b7c7-20aa-42a8-a278-f801b0d65fa1/fb548c0a-8582-43c5-9fba-cd98bf27452f/IN-en-20240326-popsignuptwoweeks-perspective_alpha_website_small.jpg' alt='img'></img>
+          <img src={BACKGROUND_URL} alt='img'></img>
         </div>
         <form onSubmit={(e) => e.preventDefault()} className='absolute bg-black px-20 py-10 w-4/12 flex flex-col my-36 mx-auto right-0 left-0 text-white bg-opacity-80 rounded-md'>
 
