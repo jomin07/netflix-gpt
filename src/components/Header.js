@@ -5,10 +5,12 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { addUser, removeUser } from "../utils/userSlice";
 import { LOGO_URL, PROFILE_URL } from '../utils/constants';
+import { toggleGptSearchView } from "../utils/gptSlice"
 
 const Header = () => {
   const navigate = useNavigate();
   const user = useSelector((store) => store.user);
+  const showGptSearch = useSelector((store) => store.gpt.showGptSearch);
   const dispatch = useDispatch();
 
   const handleSignOut = () =>{  
@@ -34,6 +36,10 @@ const Header = () => {
     return () => unsubscribe();
 
   }, []);
+
+  const handleGptSearchClick = () =>{
+     dispatch(toggleGptSearchView());
+  }
   
 
   return (
@@ -42,6 +48,7 @@ const Header = () => {
 
       {user && 
       (<div className='m-2 p-2 flex'>
+        <button onClick={handleGptSearchClick} className=' bg-violet-600 text-white mr-2 p-2 rounded-md'>{showGptSearch?"Home Page":"GPT Search"}</button>
         <img className='w-10 mx-1' src={PROFILE_URL} alt='img'></img>
 
         <button onClick={handleSignOut} className='font-bold text-white mx-1'>Sign Out</button>
