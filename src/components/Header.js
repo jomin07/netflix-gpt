@@ -43,13 +43,13 @@ const Header = () => {
   
 
   return (
-    <div className='absolute px-6 py-2 bg-gradient-to-b from-black z-10 w-screen flex justify-between '>
-      <img className='w-44' src = {LOGO_URL} alt='logo'></img>
+    <div className='absolute px-6 py-2 bg-gradient-to-b from-black z-10 w-screen flex justify-between bg-black md:bg-transparent flex-col md:flex-row '>
+      <img className='w-44 mx-auto md:mx-0' src = {LOGO_URL} alt='logo'></img>
 
       {user && 
-      (<div className='m-2 p-2 flex'>
+      (<div className='m-2 p-2 flex justify-between'>
         <button onClick={handleGptSearchClick} className=' bg-violet-600 text-white mr-2 p-2 rounded-md'>{showGptSearch?"Home Page":"GPT Search"}</button>
-        <img className='w-10 mx-1' src={PROFILE_URL} alt='img'></img>
+        <img className='hidden md:block w-10 mx-1' src={PROFILE_URL} alt='img'></img>
 
         <button onClick={handleSignOut} className='font-bold text-white mx-1'>Sign Out</button>
       </div>)}
